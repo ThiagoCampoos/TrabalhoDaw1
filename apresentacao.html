@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etapa 1 - Apresentação do Projeto Star Depiller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            body {
+                margin: 0;
+                padding: 10mm;
+            }
+            .page-break {
+                page-break-after: always;
+            }
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+            table {
+                page-break-inside: avoid;
+            }
+            pre {
+                page-break-inside: avoid;
+                background-color: #f3f4f6 !important;
+                padding: 1rem !important;
+            }
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .header p {
+            margin: 5px 0;
+            font-size: 1.1em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .subsection {
+            background-color: #f9fafb;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .subsection h4 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        table thead {
+            background-color: #667eea;
+            color: white;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        table tr:hover {
+            background-color: #f3f4f6;
+        }
+
+        .code-block {
+            background-color: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .badge-green {
+            background-color: #10b981;
+        }
+
+        .badge-orange {
+            background-color: #f59e0b;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .diagram {
+            background-color: #f9fafb;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border: 2px solid #e5e7eb;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            line-height: 1.2;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+
+        .assinatura {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .assinatura-bloco {
+            border-top: 2px solid #333;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        .requisito-ok {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .aviso {
+            background-color: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .aviso strong {
+            color: #d97706;
+        }
+
+        .print-only {
+            display: none;
+        }
+
+        @media print {
+            .print-only {
+                display: block;
+            }
+        }
+
+        /* Diagram styles */
+        .diagram-grid{ display:flex; gap:24px; flex-wrap:wrap; align-items:flex-start; }
+        .class-card{ background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px; min-width:220px; box-shadow:0 4px 10px rgba(0,0,0,0.04);}
+        .class-header{ background:linear-gradient(90deg,#667eea,#764ba2); color:#fff; padding:8px 10px; border-radius:6px; font-weight:700; margin:-12px -12px 8px -12px;}
+        .class-body{ font-family: 'Courier New', monospace; font-size:0.9em; color:#374151; line-height:1.4; }
+        .relation-row{ display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center; }
+        .arrow{ font-size:1.2rem; color:#6b7280; }
+
+        /* File tree (structure) */
+        .file-tree{ font-family: 'Courier New', monospace; color:#111827; }
+        .file-tree ul{ list-style:none; padding-left:20px; margin:0; }
+        .file-tree li{ padding:2px 0; }
+        .folder{ color:#667eea; font-weight:600; }
+        .file{ color:#374151; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<div class="max-w-4xl mx-auto bg-white p-8">
+
+    <!-- CABEÇALHO -->
+    <div class="header">
+        <h1>🎓 Trabalho Final DAW1</h1>
+        <p><strong>Star Depiller</strong> — Sistema de Gerenciamento de Clínica de Depilação</p>
+        <p style="font-size: 0.95em; margin-top: 10px;">Etapa 1: Apresentação do Tema e Diagrama de Classes</p>
+    </div>
+
+    <!-- INFORMAÇÕES GERAIS -->
+    <div class="section">
+        <h2>📋 Informações Gerais</h2>
+        <div class="subsection">
+            <p><strong>Professor:</strong> Rafael Godoi Orbolato</p>
+            <p><strong>Disciplina:</strong> Desenvolvimento de Aplicações Web 1 (DAW1)</p>
+            <p><strong>Data de Apresentação:</strong> 16/10/2025</p>
+            <p><strong>Tema:</strong> <span class="requisito-ok">Star Depiller — Sistema de Gerenciamento de Clínica de Depilação</span></p>
+        </div>
+    </div>
+
+    <!-- INTEGRANTES -->
+    <div class="section">
+        <h2>👥 Integrantes do Grupo</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Integrante</th>
+                    <th>Matrícula</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Integrante 1</td>
+                    <td>[Thiago Campos]</td>
+                </tr>
+                <tr>
+                    <td>Integrante 2</td>
+                    <td>[Guilherme Agusto]</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- VISÃO GERAL -->
+    <div class="section">
+        <h2>🎯 Visão Geral do Sistema</h2>
+        <h3>Objetivo</h3>
+        <p>Desenvolver um sistema web para <strong>gerenciamento de uma clínica de depilação a laser</strong>, permitindo:</p>
+        <ul class="list-disc list-inside space-y-2">
+            <li>Cadastro e gestão de clientes</li>
+            <li>Planejamento de tratamentos e sessões de laser</li>
+            <li>Avaliação e acompanhamento de clientes</li>
+            <li>Controle de usuários (admin e funcionário)</li>
+            <li>Geração de relatórios úteis para o negócio</li>
+        </ul>
+
+        <h3>Justificativa</h3>
+        <p>A clínica de depilação a laser necessita de um sistema de gestão eficiente que:</p>
+        <ul class="list-disc list-inside space-y-2">
+            <li>Organize o histórico de clientes e suas informações de saúde</li>
+            <li>Controle sessões agendadas e realizadas</li>
+            <li>Acompanhe o progresso de tratamentos</li>
+            <li>Gere relatórios para tomadas de decisão (clientes ativos, faturamento, etc.)</li>
+        </ul>
+    </div>
+
+    <!-- DIAGRAMA DE CLASSES -->
+    <div class="section page-break">
+        <h2>📊 Diagrama de Classes Simplificado</h2>
+        <p><em>Diagrama OO (não é ER) mostrando as classes e relacionamentos principais do sistema.</em></p>
+        
+        <div class="diagram-grid">
+            <div class="class-card" style="min-width:280px;">
+                <div class="class-header">USUARIO</div>
+                <div class="class-body">
+                    <div><strong>id:</strong> UUID (PK)</div>
+                    <div><strong>email:</strong> String</div>
+                    <div><strong>senha:</strong> String (hash)</div>
+                    <div><strong>nome:</strong> String</div>
+                    <div><strong>tipo:</strong> ADMIN | FUNCIONARIO</div>
+                    <div><strong>ativo:</strong> Boolean</div>
+                </div>
+            </div>
+
+            <div class="relation-row" aria-hidden="true">
+                <div class="arrow">▲</div>
+                <div class="arrow" style="font-size:0.9rem;color:#9ca3af">(herança)</div>
+                <div class="arrow">▼</div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                <div class="class-card" style="width:200px;">
+                    <div class="class-header">ADMIN</div>
+                    <div class="class-body">Permissões administrativas</div>
+                </div>
+                <div class="class-card" style="width:200px;">
+                    <div class="class-header">FUNCIONÁRIO</div>
+                    <div class="class-body">Permissões operacionais</div>
+                </div>
+            </div>
+
+            <div style="flex-basis:100%;height:0"></div>
+
+            <div class="class-card" style="min-width:360px;">
+                <div class="class-header">CLIENTE</div>
+                <div class="class-body">
+                    <div><strong>id:</strong> UUID (PK)</div>
+                    <div><strong>nome:</strong> String</div>
+                    <div><strong>telefone:</strong> String</div>
+                    <div><strong>email:</strong> String</div>
+                    <div><strong>dataNascimento:</strong> LocalDate</div>
+                    <div><strong>endereço:</strong> rua, nº, bairro, cep</div>
+                    <div><strong>cidade:</strong> String</div>
+                    <div><strong>cpfRg:</strong> String</div>
+                    <div><strong>sexo:</strong> MASCULINO | FEMININO | OUTRO</div>
+                    <div><strong>favorito:</strong> Boolean</div>
+                    <div><strong>criadoEm/atualizadoEm:</strong> LocalDateTime</div>
+                </div>
+            </div>
+
+            <div class="relation-row" style="align-items:flex-start;">
+                <div class="arrow" style="margin-top:12px">▲</div>
+                <div style="font-size:0.9rem;color:#6b7280;margin-top:6px">1:N — cliente → (fichas, tratamentos, sessões)</div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+                <div class="class-card">
+                    <div class="class-header">FICHA AVALIAÇÃO</div>
+                    <div class="class-body">
+                        <div><strong>id:</strong> UUID (PK)</div>
+                        <div><strong>cliente_id:</strong> FK</div>
+                        <div><strong>fototipo:</strong> String</div>
+                        <div><strong>alergias/medicamentos/históricoLaser</strong></div>
+                        <div><strong>consentimento:</strong> Boolean + data</div>
+                    </div>
+                </div>
+
+                <div class="class-card">
+                    <div class="class-header">TRATAMENTO</div>
+                    <div class="class-body">
+                        <div><strong>id:</strong> UUID (PK)</div>
+                        <div><strong>cliente_id:</strong> FK</div>
+                        <div><strong>areaTratamento:</strong> String</div>
+                        <div><strong>sessoesRecomendadas:</strong> Int</div>
+                        <div><strong>status:</strong> ATIVO | PAUSADO | CONCLUIDO | CANCELADO</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="flex-basis:100%;height:0"></div>
+
+            <div class="class-card" style="min-width:320px;">
+                <div class="class-header">SESSÃO</div>
+                <div class="class-body">
+                    <div><strong>id:</strong> UUID (PK)</div>
+                    <div><strong>tratamento_id:</strong> FK</div>
+                    <div><strong>cliente_id:</strong> FK</div>
+                    <div><strong>dataSessao / hora</strong></div>
+                    <div><strong>protocolo / profissional</strong></div>
+                    <div><strong>valor:</strong> Decimal</div>
+                    <div><strong>ehReavaliacao:</strong> Boolean</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODELO DE DADOS -->
+    <div class="section page-break">
+        <h2>🗄️ Modelo de Dados (Banco PostgreSQL)</h2>
+        
+        <h3>Tabelas Principais</h3>
+
+        <div class="subsection">
+            <h4>1. USUARIOS</h4>
+            <p>Identifica e autentica os usuários do sistema com controle de acesso por perfil.</p>
+            <ul class="list-disc list-inside text-sm">
+                <li>Apenas <span class="badge">ADMIN</span> pode criar novos usuários</li>
+                <li>Senhas são armazenadas com hash bcrypt</li>
+                <li>Campo "ativo" permite desativar usuários sem deletar</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <h4>2. CLIENTES</h4>
+            <p>Cadastro completo de clientes da clínica com todas as informações de contato.</p>
+            <ul class="list-disc list-inside text-sm">
+                <li>Campos obrigatórios: nome, telefone</li>
+                <li>Flag "favorito" marca clientes frequentes</li>
+                <li>Rastreamento de criação e atualização com timestamps</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <h4>3. FICHAS_AVALIACAO (1:1 ou 1:N com Cliente)</h4>
+            <p>Anamnese e histórico de saúde do cliente para orientar tratamento.</p>
+            <ul class="list-disc list-inside text-sm">
+                <li>Registra histórico com laser anterior</li>
+                <li>Alergias, medicações contínuas e condições de saúde</li>
+                <li>Consentimento do cliente com timestamp</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <h4>4. TRATAMENTOS (1:N com Cliente)</h4>
+            <p>Define o plano de tratamento com área a ser tratada e sessões recomendadas.</p>
+            <ul class="list-disc list-inside text-sm">
+                <li>Status: <span class="badge">ATIVO</span> <span class="badge">PAUSADO</span> <span class="badge">CONCLUIDO</span> <span class="badge-orange">CANCELADO</span></li>
+                <li>Permite pausar tratamentos sem cancelar</li>
+                <li>Sessões recomendadas para planejamento</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <h4>5. SESSOES (1:N com Tratamento)</h4>
+            <p>Registra cada sessão de laser realizada com dados do procedimento.</p>
+            <ul class="list-disc list-inside text-sm">
+                <li>Data e hora do agendamento</li>
+                <li>Protocolo utilizado e profissional responsável</li>
+                <li>Valor da sessão (para relatório de faturamento)</li>
+                <li>Flag "reavaliação" para sessões especiais</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- REQUISITOS -->
+    <div class="section page-break">
+        <h2>✅ Atendimento aos Requisitos do Trabalho</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th width="10%">Req.</th>
+                    <th width="50%">Descrição</th>
+                    <th width="40%">Como Atendemos</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td>Classes com relação 1:N</td>
+                    <td>CLIENTE → TRATAMENTO → SESSAO e CLIENTE → FICHA_AVALIACAO</td>
+                </tr>
+                <tr>
+                    <td><strong>2</strong></td>
+                    <td>JPA/Hibernate/Flyway</td>
+                    <td>Spring Data JPA com migrations Flyway para versionamento BD</td>
+                </tr>
+                <tr>
+                    <td><strong>3</strong></td>
+                    <td>Thymeleaf + htmx</td>
+                    <td>Templates Thymeleaf com htmx para requisições AJAX dinâmicas</td>
+                </tr>
+                <tr>
+                    <td><strong>3.1</strong></td>
+                    <td>CSS Tailwind</td>
+                    <td>Estilização responsiva com Tailwind CSS</td>
+                </tr>
+                <tr>
+                    <td><strong>3.2</strong></td>
+                    <td>Componentes JS</td>
+                    <td>Datepickers, hora, valor monetário, confirmações modais</td>
+                </tr>
+                <tr>
+                    <td><strong>4</strong></td>
+                    <td>Validação backend</td>
+                    <td>@NotNull, @Email, @Size + validadores customizados em Services</td>
+                </tr>
+                <tr>
+                    <td><strong>5</strong></td>
+                    <td>Paginação</td>
+                    <td>Implementada em Clientes, Sessões, Tratamentos</td>
+                </tr>
+                <tr>
+                    <td><strong>6</strong></td>
+                    <td>Páginas de erro</td>
+                    <td>Erro 404, 403 (acesso negado), 500 customizadas</td>
+                </tr>
+                <tr>
+                    <td><strong>7</strong></td>
+                    <td>Controle de acesso + HTTPS</td>
+                    <td>Spring Security com 2 roles: ADMIN e FUNCIONARIO</td>
+                </tr>
+                <tr>
+                    <td><strong>8</strong></td>
+                    <td>Admin cria usuários</td>
+                    <td>Página de cadastro de usuários (apenas ADMIN)</td>
+                </tr>
+                <tr>
+                    <td><strong>9</strong></td>
+                    <td>CRUD completo</td>
+                    <td><span class="requisito-ok">CLIENTES</span> (listagem, cadastro, edição, deleção)</td>
+                </tr>
+                <tr>
+                    <td><strong>10</strong></td>
+                    <td>Relatório PDF</td>
+                    <td>Relatório de Sessões Realizadas com subrelatório de clientes</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- STACK TECNOLÓGICO -->
+    <div class="section">
+        <h2>🔧 Stack Tecnológico</h2>
+        
+        <h3>Backend</h3>
+        <ul class="space-y-2">
+            <li><span class="badge">Spring Boot 3.x</span> Framework web moderno</li>
+            <li><span class="badge">Spring Data JPA</span> Persistência e queries</li>
+            <li><span class="badge">Hibernate</span> ORM (Object-Relational Mapping)</li>
+            <li><span class="badge">Flyway</span> Versionamento e migrations do BD</li>
+            <li><span class="badge">PostgreSQL</span> Banco de dados relacional</li>
+            <li><span class="badge">Spring Security</span> Autenticação e autorização</li>
+            <li><span class="badge">Thymeleaf</span> Template engine para views</li>
+            <li><span class="badge">iText / JasperReports</span> Geração de PDF</li>
+        </ul>
+
+        <h3>Frontend</h3>
+        <ul class="space-y-2">
+            <li><span class="badge">Thymeleaf</span> Templates HTML dinâmicos</li>
+            <li><span class="badge">htmx</span> Requisições AJAX simplificadas</li>
+            <li><span class="badge">Tailwind CSS</span> Estilização responsiva</li>
+            <li><span class="badge">JavaScript Vanilla</span> Componentes interativos</li>
+        </ul>
+
+        <h3>Infraestrutura</h3>
+        <ul class="space-y-2">
+            <li><span class="badge">GitHub/GitLab</span> Controle de versão</li>
+            <li><span class="badge">Maven</span> Gerenciador de dependências</li>
+            <li><span class="badge">HTTPS</span> Comunicação segura</li>
+        </ul>
+    </div>
+
+    <!-- FLUXOS PRINCIPAIS -->
+    <div class="section page-break">
+        <h2>📈 Fluxos Principais do Sistema</h2>
+
+        <h3>Fluxo 1: Cadastro de Novo Cliente</h3>
+        <div class="subsection">
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+                <li>Usuário (FUNCIONARIO) acessa menu "Clientes"</li>
+                <li>Clica em "Novo Cliente"</li>
+                <li>Preenche formulário (nome, telefone, endereço, etc.)</li>
+                <li>Sistema valida dados no backend</li>
+                <li>Salva em BD com timestamps de criação</li>
+                <li>Redireciona para lista de clientes</li>
+            </ol>
+        </div>
+
+        <h3>Fluxo 2: Criar Tratamento para Cliente</h3>
+        <div class="subsection">
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+                <li>FUNCIONARIO busca cliente na lista</li>
+                <li>Clica em "Novo Tratamento"</li>
+                <li>Seleciona área (perna, axilas, rosto, etc.)</li>
+                <li>Define sessões recomendadas</li>
+                <li>Sistema cria tratamento com status ATIVO</li>
+                <li>Página lista tratamentos do cliente</li>
+            </ol>
+        </div>
+
+        <h3>Fluxo 3: Agendar Sessão de Laser</h3>
+        <div class="subsection">
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+                <li>FUNCIONARIO acessa "Sessões" e clica "Nova Sessão"</li>
+                <li>Seleciona cliente e tratamento ativo</li>
+                <li>Define data/hora, protocolo, profissional responsável</li>
+                <li>Sistema valida se tratamento está ATIVO</li>
+                <li>Salva sessão com valor e observações</li>
+                <li>Exibe em agenda e lista de sessões</li>
+            </ol>
+        </div>
+
+        <h3>Fluxo 4: Gerar Relatório em PDF</h3>
+        <div class="subsection">
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+                <li>ADMIN acessa "Relatórios" → "Sessões Realizadas"</li>
+                <li>Define período (data início, data fim, clínica)</li>
+                <li>Sistema gera PDF com:
+                    <ul class="list-disc list-inside ml-4">
+                        <li>Total de sessões no período</li>
+                        <li>Subrelatório: clientes atendidos e quantas sessões cada um</li>
+                        <li>Faturamento total estimado</li>
+                        <li>Profissionais e áreas mais tratadas</li>
+                    </ul>
+                </li>
+                <li>Disponibiliza download do arquivo</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- SEGURANÇA -->
+    <div class="section">
+        <h2>🔐 Segurança e Controle de Acesso</h2>
+
+        <h3>Tipos de Usuário</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Papel</th>
+                    <th>Permissões</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>ADMIN</strong></td>
+                    <td>
+                        • Criar/editar/deletar usuários<br/>
+                        • Visualizar relatórios avançados<br/>
+                        • Acessar todas as funcionalidades<br/>
+                        • Gerenciar clínicas/profissionais
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>FUNCIONARIO</strong></td>
+                    <td>
+                        • Cadastrar/editar clientes<br/>
+                        • Registrar sessões<br/>
+                        • Visualizar agenda<br/>
+                        • Gerar fichas de avaliação<br/>
+                        • <strong>NÃO pode</strong> deletar clientes ou gerenciar usuários
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Autenticação</h3>
+        <ul class="list-disc list-inside space-y-2 text-sm">
+            <li>Login com email e senha (hash bcrypt — não reversível)</li>
+            <li>Sessão gerenciada por Spring Security</li>
+            <li>HTTPS obrigatório em produção (porta 443)</li>
+            <li>Timeout de sessão para segurança</li>
+        </ul>
+
+        <h3>Autorização</h3>
+        <ul class="list-disc list-inside space-y-2 text-sm">
+            <li>Anotações <code>@PreAuthorize("hasRole('ADMIN')")</code> em endpoints críticos</li>
+            <li>Thymeleaf com <code>sec:authorize</code> para mascarar elementos de UI</li>
+            <li>Validação no backend (não confiar apenas em frontend)</li>
+        </ul>
+    </div>
+
+    <!-- ESTRUTURA DO PROJETO -->
+    <div class="section page-break">
+        <h2>🏗️ Estrutura do Projeto</h2>
+
+        <div class="code-block file-tree">
+            <ul>
+                <li class="folder">star-depiller-backend/</li>
+                <ul>
+                    <li class="folder">src/main/java/com/stardepiller/</li>
+                    <ul>
+                        <li class="folder">config/ <span class="file">(Security, JPA...)</span></li>
+                        <li class="folder">entity/ <span class="file">(Cliente, Tratamento...)</span></li>
+                        <li class="folder">repository/ <span class="file">(Repositories)</span></li>
+                        <li class="folder">service/ <span class="file">(Lógica e validações)</span></li>
+                        <li class="folder">controller/ <span class="file">(MVC)</span></li>
+                        <li class="folder">exception/ <span class="file">(Erros customizados)</span></li>
+                        <li class="folder">util/ <span class="file">(Utilitários)</span></li>
+                    </ul>
+                    <li class="folder">src/main/resources/</li>
+                    <ul>
+                        <li class="folder">templates/ <span class="file">(Thymeleaf)</span></li>
+                        <li class="folder">static/ <span class="file">(css/, js/)</span></li>
+                        <li class="folder">db/migration/ <span class="file">(Flyway)</span></li>
+                        <li class="file">application.properties</li>
+                    </ul>
+                    <li class="file">pom.xml <span class="file">(Maven)</span></li>
+                </ul>
+            </ul>
+        </div>
+    </div>
+
+
+
+    <!-- RODAPÉ -->
+    <div class="footer">
+        <p>📄 Documento gerado para apresentação da Etapa 1 — Trabalho Final DAW1</p>
+        <p>🏫 Instituto Federal do Triângulo Mineiro (IFTM)</p>
+        <p style="margin-top: 10px; font-size: 0.8em;">Última atualização: 16/10/2025</p>
+    </div>
+
+</div>
+
+<!-- BOTÃO IMPRIMIR -->
+<div class="fixed bottom-8 right-8 no-print">
+    <button onclick="window.print()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition">
+        📥 Imprimir como PDF
+    </button>
+</div>
+
+</body>
+</html>
