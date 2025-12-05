@@ -1,0 +1,53 @@
+# Plano de Projeto — Star Depiller Backend
+
+## Tema e Escopo
+- **Tema:** Sistema Web para clínica de depilação a laser (Star Depiller).
+- **Objetivo:** Gerenciar clientes, fichas de avaliação, tratamentos, sessões e usuários internos, com segurança, relatórios e UX moderna (Thymeleaf + htmx + Tailwind).
+
+## Entregáveis por Etapa
+1. **Etapa A:** Apresentação (tema, equipe, diagrama OO simplificado).  
+2. **Etapas B–C:** Modelagem + JPA/Flyway (entidades, relacionamentos 1:N, migrações).  
+3. **Etapa D:** CRUD completo (ex.: clientes) com Controller, Service, Repository, Views htmx/Thymeleaf.  
+4. **Etapa E:** Lógica de negócio (agendamento e acompanhamento de sessões e tratamentos).  
+5. **Etapa F:** Segurança (Spring Security, perfis ADMIN/FUNCIONARIO, criação de usuários, HTTPS).  
+6. **Etapa G:** Relatório PDF (tratamentos e sessões por cliente, com sub-relatório).  
+7. **Etapa H:** Apresentação final (demonstração ponta a ponta).
+
+## Backlog Técnico
+- **Setup:** Spring Boot 3.x, Java 17+, Maven, dependências (web, thymeleaf, data-jpa, validation, security, flyway, postgresql, h2 test, jasperreports, thymeleaf-extras-springsecurity6, lombok).  
+- **Infra:** Configurar `application.properties`, perfis (`application-dev/test/prod`), Docker Compose opcional (Postgres).  
+- **Modelagem:** Entidades `Usuario`, `Cliente`, `FichaAvaliacao`, `Tratamento`, `Sessao` com anotações JPA + validação.  
+- **Migrations:** Flyway (`V1__create_usuario.sql`, etc.).  
+- **Serviços:** Regras de negócio (e.g., cálculo de sessões pendentes, bloqueio de reagendamento).  
+- **Views:** Layout base com Tailwind, fragmentos Thymeleaf, componentes htmx (listas paginadas, formulários dinâmicos).  
+- **Paginação:** Spring Data `Pageable` + htmx (botões “Próxima/Anterior”).  
+- **Segurança:** Configuração de `SecurityFilterChain`, BCrypt, seeding de usuário admin, fluxo de cadastro via ADMIN.  
+- **Relatórios:** JasperReports (`relatorios/tratamentos.jasper` + sub-relatório `sessao_sub.jasper`).  
+- **Testes:** JUnit + Spring Boot Test, uso de H2.  
+- **Erros:** Views dedicadas (`templates/error/404.html`, `500.html`, etc.).  
+- **DevOps:** Scripts Maven (`mvn spring-boot:run`, `mvn clean verify`), checklist HTTPS (self-signed ou reverse proxy).
+
+## Sequência Recomendada
+1. **Geração do projeto** via Spring Initializr -> abrir no VS Code.  
+2. **Configuração inicial** (`pom.xml`, properties, Lombok, Tailwind build script).  
+3. **Modelagem e migrations** (Etapas B/C).  
+4. **CRUD Clientes** (controllers, services, views com htmx) + paginação.  
+5. **Fluxo de tratamentos/sessões** (lógica negócio).  
+6. **Segurança** (perfis, cadastro usuário).  
+7. **Validações + testes**.  
+8. **Relatórios PDF**.  
+9. **Erros customizados + refinamentos UX/UI**.  
+10. **Preparação apresentação final** (scripts demo, dados seed, slides curtos).
+
+## Próximos Passos Imediatos
+1. Gerar o projeto Spring Boot com dependências listadas.  
+2. Ajustar `pom.xml` e `application.properties` (Postgres dev).  
+3. Implementar entidade `Usuario` corrigindo imports JPA e migração `V1__create_usuario.sql`.  
+4. Criar esboço do diagrama no `docs/` para Etapa A.  
+5. Configurar Tailwind workflow (npm + script `npm run dev`/`build`).
+
+## Referências Úteis
+- Documentação Spring Boot, Spring Data, Spring Security 6.  
+- Guia htmx (htmx.org/docs).  
+- Tailwind CLI (tailwindcss.com/docs/installation).  
+- JasperReports usuários (community.jaspersoft.com).
