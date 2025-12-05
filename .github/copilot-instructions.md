@@ -1,81 +1,85 @@
-**Project Overview**
+**Visão geral do projeto**
 
-- **Stack**: Spring Boot (3.5.x), Java 17, Maven. See `dev/pom.xml` for dependencies (Web, Thymeleaf, Data JPA, Security, Flyway, Postgres runtime).
-- **Main entry**: `dev/src/main/java/systemagenda/com/dev/DevApplication.java` — standard Spring Boot app.
-- **Runtime DB**: Postgres expected in production; tests use H2 (see `pom.xml`). Flyway is present for DB migrations.
+- **Stack**: Spring Boot 3.5.x, Java 17, Maven. Dependências principais em `dev/pom.xml` (Web, Thymeleaf, Data JPA, Validation, Security, Flyway, Postgres, JasperReports).
+- **Entry point**: `dev/src/main/java/systemagenda/com/dev/DevApplication.java`.
+- **Banco**: PostgreSQL em runtime (Flyway para migrações), H2 apenas para testes.
 
-**How To Build & Run (developer)**
+**Modelo de domínio e JPA**
 
-- Windows (recommended):
+- Entidades estão em `dev/src/main/java/systemagenda/com/dev/entity` e mapeiam tabelas Flyway:
+  - `Usuario` ↔ tabela `usuarios`.
+  - `Cliente` ↔ tabela `clientes`.
+  - `Tratamento` ↔ tabela `tratamentos`.
+  - `Sessao` ↔ tabela `sessoes`.
+  - `FichaAvaliacao` ↔ tabela `ficha_avaliacao` / `fichas_avaliacao`.
+- Padrões das entidades:
+  - `@Entity` + `@Table(name = "<tabela>")` quando o nome não é trivial.
+  - Chave primária com `UUID` e `@GeneratedValue(strategy = GenerationType.UUID)`.
+  - Construtor vazio público + getters/setters explícitos (não usar Lombok nas classes existentes).
+- Relacionamentos importantes (usar como referência para novos relacionamentos):
+  - `Cliente` 1–1 `FichaAvaliacao` (`@OneToOne(mappedBy = "cliente")`).
+  - `Cliente` 1–N `Tratamento` (`@OneToMany(mappedBy = "cliente")`).
+  - `Tratamento` 1–N `Sessao` com `cascade = CascadeType.ALL` e `orphanRemoval = true`.
+  - `Sessao` N–1 `Tratamento` e `Tratamento` N–1 `Cliente` usando `@ManyToOne` + `@JoinColumn`.
+- Colunas com nomes específicos devem usar `@Column(name = ...)`, por exemplo:
+  - `Sessao.dataSessao` ↔ `data_sessao`.
+  - `Sessao.ehReavaliacao` ↔ `eh_reavaliacao`.
+  - `Tratamento.areaTratamento` ↔ `area_tratamento`.
 
-  1. Open a `cmd.exe` in repo root and run:
+**Migrações e banco de dados**
 
-     ```cmd
-     cd dev
-     mvnw.cmd clean package
-     ```
+- Migrações Flyway ficam em `dev/src/main/resources/db/migration` (exemplo: `V1__create_tabelas.sql`).
+- Não editar arquivos de migração já aplicados; para alterações, criar novos arquivos `V2__...`, `V3__...` etc.
+- Ao criar campos/entidades novas, manter coerência entre tipos e nomes:
+  - `snake_case` no SQL, `camelCase` no Java com `@Column(name = ...)` quando necessário.
+  - Preferir `UUID` para PKs novas mesmo que a migração antiga use `SERIAL`.
 
-  2. Run the packaged jar:
+**Configuração de execução local**
 
-     ```cmd
-     java -jar target\dev-0.0.1-SNAPSHOT.jar
-     ```
+- Configurações principais em `dev/src/main/resources/application.properties`:
+  - `spring.datasource.url=jdbc:postgresql://localhost:8000/stardepiller`.
+  - `spring.datasource.username=stardepiller`.
+  - `spring.datasource.password=159753`.
+  - `spring.jpa.hibernate.ddl-auto=none` (schema só via Flyway).
+  - `spring.flyway.enabled=true` e `spring.flyway.locations=classpath:db/migration`.
+  - `server.port=8081` (acesso em `http://localhost:8081`).
+- Não trocar credenciais hardcoded por variáveis de ambiente sem pedido explícito, mas evitar espalhar esse padrão para novos exemplos.
 
-- Alternative (dev mode):
+**Como buildar, testar e rodar**
 
-  ```cmd
-  cd dev
-  mvnw.cmd spring-boot:run
-  ```
+- Sempre trabalhar dentro de `dev/`:
+  - Build: `cd dev && ./mvnw clean package` (ou `mvnw.cmd` no Windows).
+  - Testes: `cd dev && ./mvnw test`.
+  - Execução em modo dev: `cd dev && ./mvnw spring-boot:run`.
+- Jar gerado: `dev/target/dev-0.0.1-SNAPSHOT.jar` (rodar com `java -jar`).
 
-**Tests**
+**Padrões para novo código**
 
-- Run unit/integration tests:
+- **Novas entidades**: criar em `systemagenda/com/dev/entity`, copiar o estilo de `Cliente`/`Tratamento`:
+  - `UUID` como PK, construtor vazio, getters/setters.
+  - Mapeamento de relacionamento alinhado à direção já usada (por exemplo, `mappedBy` na coleção do lado 1–N).
+- **Repositórios e serviços** (quando forem necessários):
+  - Repositórios `JpaRepository` em pacote `.../repository` (a ser criado se ainda não existir).
+  - Serviços em `.../service` com `@Service`, concentrando lógica de negócio.
+- **Validação**: usar `jakarta.validation` (disponível via `spring-boot-starter-validation`) em DTOs/objetos de entrada quando criados.
 
-  ```cmd
-  cd dev
-  mvnw.cmd test
-  ```
+**Segurança, views e relatórios**
 
-- Tests use H2 as test-scoped dependency (see `dev/pom.xml`).
+- Dependências presentes no `pom.xml` indicam:
+  - **Spring Security** (`spring-boot-starter-security`) — ao criar controllers/endpoints, assumir que haverá regras de autenticação/autorização.
+  - **Thymeleaf + thymeleaf-extras-springsecurity6** — qualquer view nova deve seguir padrão de templates Thymeleaf em `resources/templates`.
+  - **JasperReports** — relatórios devem ser organizados em um diretório claro (por exemplo `resources/reports`) e reutilizáveis (não embutir `.jrxml` diretamente em código).
 
-**Source Layout & Gotchas**
+**Boas práticas específicas deste repositório**
 
-- Primary Maven layout: `dev/src/main/java` maps to package `systemagenda.com.dev` (application class location).
-- There is an additional `dev/src/java/com/stardepiler/entity/*` tree containing entities such as `Usuario.java`. This is NOT under the standard `src/main/java` layout and may not be compiled by Maven by default. When investigating compile/runtime issues, check whether these sources are intended (legacy/extra) or should be moved into `src/main/java`.
-- Templates and static assets: `dev/src/main/resources/templates` and `dev/src/main/resources/static` (standard Thymeleaf + static resource locations).
+- Não introduzir novos frameworks grandes (outro ORM, outro framework web) sem motivo forte.
+- Manter nomes de campos alinhados aos já existentes (`status` como `String`, flags booleanas com prefixo `is`/`eh`).
+- Ao criar endpoints REST ou controllers MVC:
+  - Manter separação entre entidade JPA, DTOs e camada de serviço.
+  - Evitar acessar diretamente o `EntityManager` — preferir repositórios Spring Data.
 
-**Key Files to Inspect**
+**O que o agente não deve fazer**
 
-- `dev/pom.xml` — dependency and build plugin source of truth.
-- `dev/src/main/java/systemagenda/com/dev/DevApplication.java` — app entry.
-- `dev/src/main/resources/application.properties` — base app props (currently minimal).
-- `dev/src/java/com/stardepiler/entity/Usuario.java` — example of entity found outside standard layout.
-
-**Patterns & Conventions (observed)**
-
-- Uses Spring MVC + Thymeleaf for server-side rendered views (look for controllers under `src/main/java` and templates under `resources/templates`).
-- Spring Security is present (see `spring-boot-starter-security` in `pom.xml`) — search for security configuration classes if you need to modify auth behavior.
-- JPA entities use Jakarta Persistence annotations (e.g., `@Entity`, `@Table`); UUID generation via `@UuidGenerator` is used in `Usuario.java`.
-
-**Database & Migrations**
-
-- Flyway is configured as a dependency; migrations are expected in the standard `db/migration` location under resources if used. Production expects Postgres — check environment/config when running outside tests.
-
-**When Writing Code/PRs**
-
-- Prefer adding new Java sources under `dev/src/main/java` to ensure Maven builds them by default.
-- When adding DB-backed features, add Flyway migration scripts and update `application.properties` (or the environment-specific config) to point to the test/production database.
-
-**Investigation Tips for AI agents**
-
-- If you see code that compiles locally but not in CI, confirm which source roots are compiled by Maven. Inspect `dev/pom.xml` and, locally, `mvn help:evaluate -Dexpression=project.build.sourceDirectory`.
-- To find where a class is referenced, search for its simple name across the repo (e.g., `Usuario`) and verify package imports.
-- Use `dev\\mvnw.cmd -DskipTests package` for quick packaging iterations on Windows.
-
-**Example quick checks**
-
-- Does the app start? `cd dev && mvnw.cmd spring-boot:run` then open `http://localhost:8080`.
-- Run a single test class: `cd dev && mvnw.cmd -Dtest=systemagenda.com.dev.DevApplicationTests test`.
-
-If any section is unclear or you want me to add/check more files (for example to determine whether `dev/src/java` sources are intentionally included), tell me which files to inspect and I will update this file accordingly.
+- Não apagar ou reescrever migrações Flyway já versionadas.
+- Não mudar radicalmente a configuração de banco/porta sem instrução explícita.
+- Não mover o layout Maven padrão (`src/main/java`, `src/main/resources`).
