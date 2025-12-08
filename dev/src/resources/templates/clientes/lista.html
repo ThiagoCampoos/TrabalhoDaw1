@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Clientes</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <h1>Clientes</h1>
+
+    <form
+        hx-get="/clientes"
+        hx-target="#tabela-clientes"
+        hx-push-url="true"
+        hx-trigger="keyup changed delay:400ms from:#busca">
+        <input type="text" id="busca" name="busca"
+               th:value="${busca}"
+               placeholder="Buscar por nome..." />
+        <noscript>
+            <button type="submit">Buscar</button>
+        </noscript>
+    </form>
+
+    <div id="tabela-clientes"
+         hx-get="/clientes"
+         hx-trigger="load"
+         hx-push-url="true">
+        <table border="1" cellpadding="4" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Data nascimento</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="cliente : ${pagina.content}">
+                    <td th:text="${cliente.nome}">Nome</td>
+                    <td th:text="${cliente.email}">email@example.com</td>
+                    <td th:text="${cliente.telefone}">Telefone</td>
+                    <td th:text="${cliente.dataNascimento}">2024-01-01</td>
+                </tr>
+                <tr th:if="${pagina.content.size() == 0}">
+                    <td colspan="4">Nenhum cliente encontrado.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="paginacao">
+            <button
+                th:if="${!pagina.first}"
+                hx-get="/clientes"
+                hx-target="#tabela-clientes"
+                hx-push-url="true"
+                th:attr="hx-vals=${'{' + '&quot;page&quot;:' + (${pagina.number} - 1) + ',&quot;busca&quot;:&quot;' + (busca ?: '') + '&quot;}' }">
+                Anterior
+            </button>
+
+            <span th:text="${pagina.number + 1} + ' / ' + ${pagina.totalPages}">1 / 1</span>
+
+            <button
+                th:if="${!pagina.last}"
+                hx-get="/clientes"
+                hx-target="#tabela-clientes"
+                hx-push-url="true"
+                th:attr="hx-vals=${'{' + '&quot;page&quot;:' + (${pagina.number} + 1) + ',&quot;busca&quot;:&quot;' + (busca ?: '') + '&quot;}' }">
+                Próxima
+            </button>
+        </div>
+    </div>
+</body>
+</html>

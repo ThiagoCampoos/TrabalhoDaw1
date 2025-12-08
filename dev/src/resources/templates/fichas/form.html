@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ficha de Avaliação</title>
+</head>
+<body>
+<h1>Ficha de Avaliação</h1>
+
+<form th:action="@{|/clientes/${clienteId}/ficha|}"
+      th:object="${ficha}"
+      method="post">
+
+    <div>
+        <label for="fototipo">Fototipo:</label>
+        <input id="fototipo" type="text" th:field="*{fototipo}" />
+    </div>
+
+    <div>
+        <label for="alergias">Alergias:</label>
+        <textarea id="alergias" th:field="*{alergias}"></textarea>
+    </div>
+
+    <div>
+        <label for="consentimento">
+            <input id="consentimento" type="checkbox" th:field="*{consentimento}" />
+            Li e concordo com o termo de consentimento.
+        </label>
+    </div>
+
+    <div>
+        <button type="submit">Salvar</button>
+        <a th:href="@{/clientes}">Voltar</a>
+    </div>
+</form>
+</body>
+</html>
