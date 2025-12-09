@@ -28,43 +28,35 @@
     <div
       id="tabela-clientes"
       hx-get="/clientes"
-      hx-trigger="load"
       hx-push-url="true"
     >
-      <table border="1" cellpadding="4" cellspacing="0">
+      <table>
         <thead>
           <tr>
+            <th>ID</th>
             <th>Nome</th>
             <th>Email</th>
-            <th>Telefone</th>
-            <th>Data nascimento</th>
           </tr>
         </thead>
         <tbody>
-          <tr th:each="cliente : ${pagina.content}">
-            <td th:text="${cliente.nome}">Nome</td>
-            <td th:text="${cliente.email}">email@example.com</td>
-            <td th:text="${cliente.telefone}">Telefone</td>
-            <td th:text="${cliente.dataNascimento}">2024-01-01</td>
+          <tr th:if="${#lists.isEmpty(clientes)}">
+            <td colspan="4">Nenhum cliente cadastrado.</td>
           </tr>
-          <tr th:if="${pagina.content.size() == 0}">
-            <td colspan="4">Nenhum cliente encontrado.</td>
+          <tr th:each="c : ${clientes}" th:unless="${#lists.isEmpty(clientes)}">
+            <td th:text="${c.id}"></td>
+            <td th:text="${c.nome}"></td>
+            <td th:text="${c.email}"></td>
+            <td>
+              <a th:href="@{|/clientes/${c.id}/ficha|}">Ficha</a>
+              <a th:href="@{|/clientes/${c.id}/tratamentos|}">Tratamentos</a>
+              <a th:href="@{|/clientes/${c.id}/acompanhamento|}">Acompanhamento</a>
+              <form th:action="@{|/clientes/${c.id}/excluir|}" method="post" style="display: inline">
+                <button type="submit">Excluir</button>
+              </form>
+            </td>
           </tr>
         </tbody>
       </table>
-
-      <td>
-        <a th:href="@{|/clientes/${c.id}/ficha|}">Ficha</a>
-        <a th:href="@{|/clientes/${c.id}/tratamentos|}">Tratamentos</a>
-        <a th:href="@{|/clientes/${c.id}/acompanhamento|}">Acompanhamento</a>
-        <form
-          th:action="@{|/clientes/${c.id}/excluir|}"
-          method="post"
-          style="display: inline"
-        >
-          <button type="submit">Excluir</button>
-        </form>
-      </td>
 
       <div class="paginacao">
         <button

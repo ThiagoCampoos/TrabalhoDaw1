@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StarDepiller - Agenda</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header>
+        <h1>Bem-vindo ao StarDepiller</h1>
+        <nav>
+            <a th:href="@{/clientes}">Clientes</a>
+            <a th:href="@{/tratamentos}">Tratamentos</a>
+            <a th:href="@{/sessoes}">Sessões</a>
+            <a th:href="@{/fichas-avaliacao}">Fichas de Avaliação</a>
+            <a th:href="@{/logout}">Sair</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Agenda de tratamentos</h2>
+            <p>Gerencie clientes, sessões e tratamentos de forma simples e segura.</p>
+        </section>
+        <section>
+            <h3>Relatórios</h3>
+            <a th:href="@{/relatorios}">Acessar relatórios</a>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 StarDepiller</p>
+    </footer>
+</body>
+</html>
