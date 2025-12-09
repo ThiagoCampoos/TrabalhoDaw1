@@ -40,7 +40,7 @@ public class SessaoController {
                               @RequestParam("valor") double valor,
                               @RequestParam(name = "ehReavaliacao", defaultValue = "false") boolean ehReavaliacao) {
 
-        sessaoService.CriarSessao(tratamentoId, dataSessao, protocolo, valor, ehReavaliacao);
+        sessaoService.criarSessao(tratamentoId, dataSessao, protocolo, valor, ehReavaliacao);
         return "redirect:/tratamentos/" + tratamentoId + "/sessoes";
     }
 

@@ -17,35 +17,75 @@ public class SessaoService {
     private final SessaoRepository sessaoRepository;
     private final TratamentoRepository tratamentoRepository;
 
-    public SessaoService(SessaoRepository sessaoRepository, TratamentoRepository tratamentoRepository){
+    public SessaoService(SessaoRepository sessaoRepository, TratamentoRepository tratamentoRepository) {
         this.sessaoRepository = sessaoRepository;
         this.tratamentoRepository = tratamentoRepository;
     }
 
     @Transactional(readOnly = true)
-    public List<Sessao> listarPorTratamento(UUID tratamentoId){
+    public List<Sessao> listarPorTratamento(UUID tratamentoId) {
         Tratamento tratamento = tratamentoRepository.findById(tratamentoId)
-            .orElseThrow(() -> new IllegalArgumentException("Tratamento não encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("Tratamento não encontrado"));
         return sessaoRepository.findByTratamentoOrderByDataSessaoAsc(tratamento);
     }
-    
+
     @Transactional
-    public Sessao CriarSessao (UUID tratamentoId, LocalDate data, String protocolo, double valor, boolean ehReavaliacao){
+    public Sessao criarSessao(UUID tratamentoId, LocalDate data, String protocolo, double valor,
+            boolean ehReavaliacao) {
         Tratamento tratamento = tratamentoRepository.findById(tratamentoId)
-            .orElseThrow(() -> new IllegalArgumentException("Tratamento não encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("Tratamento não encontrado"));
 
-        Sessao sessao = new Sessao();
-        sessao.setTratamento(tratamento);
-        sessao.setDataSessao(data);
-        sessao.setProtocolo(protocolo);
-        sessao.setValor(valor);
-        sessao.setEhReavaliacao(ehReavaliacao);
+        if (data.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("A data da sessão não pode ser no passado");
+        }
+        
+        boolean jaExisteNaData = sessaoRepository.existsByTratamentoAndDataSessao(tratamento, data);
+        
+        if (jaExisteNaData) {
+            throw new IllegalArgumentException("Já existe uma sessão agendada para essa data");
+        }
 
-        return sessaoRepository.save(sessao);
+        if (tratamento.getDataInicio() == null) {
+            tratamento.setDataInicio(data);
+        }
+        
+        Sessao sessao = new Sessao(data, protocolo, valor, ehReavaliacao, tratamento);
+        Sessao salva = sessaoRepository.save(sessao);
+
+        int realizadas = tratamento.getSessoesRealizadas() + 1;
+        tratamento.setSessoesRealizadas(realizadas);
+
+        atualizarStatusTratamento(tratamento);
+
+        tratamentoRepository.save(tratamento);
+
+        return salva;
     }
-    
+
+    private void atualizarStatusTratamento(Tratamento tratamento) {
+        int realizadas = tratamento.getSessoesRealizadas();
+        int recomendadas = tratamento.getSessoesRecomendadas();
+
+        if (realizadas == 0) {
+            tratamento.setStatus("AGENDADO");
+        } else if (realizadas < recomendadas) {
+            tratamento.setStatus("EM ANDAMENTO");
+        } else {
+            tratamento.setStatus("CONCLUÍDO");
+        }
+    }
+
     @Transactional
-    public void excluir (UUID sessaoId){
-        sessaoRepository.deleteById(sessaoId);
+    public void excluir(UUID sessaoId) {
+        Sessao sessao = sessaoRepository.findById(sessaoId)
+                .orElseThrow(() -> new IllegalArgumentException("Sessão não encontrada"));
+        Tratamento tratamento = sessao.getTratamento();
+
+        sessaoRepository.delete(sessao);
+
+        int realizadas = Math.max(0, tratamento.getSessoesRealizadas() - 1);
+        tratamento.setSessoesRealizadas(realizadas);
+        atualizarStatusTratamento(tratamento);
+        tratamentoRepository.save(tratamento);
     }
 }

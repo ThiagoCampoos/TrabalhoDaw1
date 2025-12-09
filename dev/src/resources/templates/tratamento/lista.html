@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Tratamentos do Cliente</title>
+  </head>
+  <body>
+    <h1>Tratamentos</h1>
+
+    <div id="tabela-tratamentos">
+      <table border="1" cellpadding="4" cellspacing="0">
+        <thead>
+          <tr>
+            <th>Área</th>
+            <th>Sessões recomendadas</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="t : ${tratamentos}">
+            <td th:text="${t.areaTratamento}">Área</td>
+            <td th:text="${t.sessoesRecomendadas}">0</td>
+            <td th:text="${t.status}">Status</td>
+            <td>
+              <a th:href="@{|/tratamentos/${t.id}/sessoes|}">Sessões</a>
+              <form
+                th:action="@{|/clientes/${clienteId}/tratamentos/${t.id}/excluir|}"
+                method="post"
+                style="display: inline"
+              >
+                <button type="submit">Excluir</button>
+              </form>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(tratamentos)}">
+            <td colspan="4">Nenhum tratamento cadastrado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Novo tratamento</h2>
+    <form
+      th:action="@{|/clientes/${clienteId}/tratamentos|}"
+      th:object="${tratamento}"
+      method="post"
+      hx-post="@{|/clientes/${clienteId}/tratamentos|}"
+      hx-target="#tabela-tratamentos"
+      hx-swap="outerHTML"
+    >
+      <div>
+        <label for="areaTratamento">Área:</label>
+        <input id="areaTratamento" th:field="*{areaTratamento}" required />
+      </div>
+
+      <div>
+        <label for="sessoesRecomendadas">Sessões recomendadas:</label>
+        <input
+          id="sessoesRecomendadas"
+          type="number"
+          min="1"
+          th:field="*{sessoesRecomendadas}"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="status">Status:</label>
+        <input
+          id="status"
+          th:field="*{status}"
+          placeholder="ATIVO, CONCLUÍDO, etc."
+        />
+      </div>
+
+      <div>
+        <button type="submit">Salvar</button>
+        <a th:href="@{/clientes}">Voltar</a>
+      </div>
+    </form>
+  </body>
+</html>

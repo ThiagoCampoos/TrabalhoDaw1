@@ -1,5 +1,6 @@
 package systemagenda.com.dev.entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +33,16 @@ public class Tratamento {
     @Column(length = 50)
     private String status;
 
+    @Column(name = "sessoes_realizadas")
+    private int sessoesRealizadas;
+    
+    @Column(name = "data_inicio")
+    private LocalDate dataInicio;
+
+    @Column(name = "data_fim_prevista")
+    private LocalDate dataFimPrevista;
+    
+
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
@@ -42,11 +53,14 @@ public class Tratamento {
     public Tratamento() {
     }
 
-    public Tratamento(String areaTratamento, int sessoesRecomendadas, String status, Cliente cliente) {
+    public Tratamento(String areaTratamento, int sessoesRecomendadas, String status, Cliente cliente,int sessoesRealizadas, LocalDate dataInicio, LocalDate dataFimPrevista) {
         this.areaTratamento = areaTratamento;
         this.sessoesRecomendadas = sessoesRecomendadas;
         this.status = status;
         this.cliente = cliente;
+        this.sessoesRealizadas = sessoesRealizadas;
+        this.dataInicio = dataInicio;
+        this.dataFimPrevista = dataFimPrevista;
     }
 
     public UUID getId() {
@@ -95,5 +109,23 @@ public class Tratamento {
 
     public void setSessoes(List<Sessao> sessoes) {
         this.sessoes = sessoes;
+    }
+    public int getSessoesRealizadas() {
+        return sessoesRealizadas;
+    }
+    public void setSessoesRealizadas(int sessoesRealizadas) {
+        this.sessoesRealizadas = sessoesRealizadas;
+    }
+    public LocalDate getDataInicio() {
+        return dataInicio;
+    }
+    public void setDataInicio(LocalDate dataInicio) {
+        this.dataInicio = dataInicio;
+    }
+    public LocalDate getDataFimPrevista() {
+        return dataFimPrevista;
+    }
+    public void setDataFimPrevista(LocalDate dataFimPrevista) {
+        this.dataFimPrevista = dataFimPrevista;
     }
 }
