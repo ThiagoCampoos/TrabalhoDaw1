@@ -1,83 +1,166 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <title>Tratamentos do Cliente</title>
-  </head>
-  <body>
-    <h1>Tratamentos</h1>
-
-    <div id="tabela-tratamentos">
-      <table border="1" cellpadding="4" cellspacing="0">
-        <thead>
-          <tr>
-            <th>Área</th>
-            <th>Sessões recomendadas</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr th:each="t : ${tratamentos}">
-            <td th:text="${t.areaTratamento}">Área</td>
-            <td th:text="${t.sessoesRecomendadas}">0</td>
-            <td th:text="${t.status}">Status</td>
-            <td>
-              <a th:href="@{|/tratamentos/${t.id}/sessoes|}">Sessões</a>
-              <form
-                th:action="@{|/clientes/${clienteId}/tratamentos/${t.id}/excluir|}"
-                method="post"
-                style="display: inline"
-              >
-                <button type="submit">Excluir</button>
-              </form>
-            </td>
-          </tr>
-          <tr th:if="${#lists.isEmpty(tratamentos)}">
-            <td colspan="4">Nenhum tratamento cadastrado.</td>
-          </tr>
-        </tbody>
-      </table>
+    <title>Tratamentos do Cliente - Star Depiller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+<header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-semibold tracking-tight">
+                Star <span class="text-emerald-400">Depiller</span>
+            </h1>
+            <p class="text-xs text-slate-400">
+                Tratamentos do cliente
+            </p>
+        </div>
+        <a th:href="@{/clientes}"
+           class="text-xs text-slate-300 hover:text-emerald-300 transition-colors">
+            Voltar para clientes
+        </a>
     </div>
+</header>
 
-    <h2>Novo tratamento</h2>
-    <form
-      th:action="@{|/clientes/${clienteId}/tratamentos|}"
-      th:object="${tratamento}"
-      method="post"
-      hx-post="@{|/clientes/${clienteId}/tratamentos|}"
-      hx-target="#tabela-tratamentos"
-      hx-swap="outerHTML"
-    >
-      <div>
-        <label for="areaTratamento">Área:</label>
-        <input id="areaTratamento" th:field="*{areaTratamento}" required />
-      </div>
+<main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
 
-      <div>
-        <label for="sessoesRecomendadas">Sessões recomendadas:</label>
-        <input
-          id="sessoesRecomendadas"
-          type="number"
-          min="1"
-          th:field="*{sessoesRecomendadas}"
-          required
-        />
-      </div>
+    <!-- Lista de tratamentos -->
+    <section class="bg-slate-900/70 border border-slate-800 rounded-2xl shadow-lg shadow-black/40 overflow-hidden">
+        <div class="px-4 py-3 flex items-center justify-between border-b border-slate-800">
+            <div>
+                <h2 class="text-lg font-semibold">Tratamentos</h2>
+                <p class="text-xs text-slate-400">
+                    Áreas, número de sessões recomendadas e status atual.
+                </p>
+            </div>
+        </div>
 
-      <div>
-        <label for="status">Status:</label>
-        <input
-          id="status"
-          th:field="*{status}"
-          placeholder="ATIVO, CONCLUÍDO, etc."
-        />
-      </div>
+        <div id="tabela-tratamentos" class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-slate-900/80 border-b border-slate-800">
+                <tr>
+                    <th class="px-4 py-3 text-left font-medium text-slate-400">Área</th>
+                    <th class="px-4 py-3 text-left font-medium text-slate-400">Sessões recomendadas</th>
+                    <th class="px-4 py-3 text-left font-medium text-slate-400">Status</th>
+                    <th class="px-4 py-3 text-left font-medium text-slate-400">Ações</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800">
+                <tr th:each="t : ${tratamentos}"
+                    class="hover:bg-slate-900/60 transition-colors">
+                    <td class="px-4 py-3" th:text="${t.areaTratamento}">
+                        Área
+                    </td>
+                    <td class="px-4 py-3" th:text="${t.sessoesRecomendadas}">
+                        0
+                    </td>
+                    <td class="px-4 py-3">
+                        <span th:text="${t.status}"
+                              class="inline-flex items-center px-2 py-0.5 rounded-full text-xs
+                                     bg-slate-800 text-slate-200 border border-slate-700">
+                            Status
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <a th:href="@{|/tratamentos/${t.id}/sessoes|}"
+                               class="inline-flex items-center rounded-full bg-slate-800 px-3 py-1
+                                      text-slate-200 border border-slate-700 hover:border-emerald-400
+                                      hover:text-emerald-300 transition-colors">
+                                Sessões
+                            </a>
+                            <form th:action="@{|/clientes/${clienteId}/tratamentos/${t.id}/excluir|}"
+                                  method="post"
+                                  onsubmit="return confirm('Confirma excluir este tratamento?');">
+                                <button type="submit"
+                                        class="inline-flex items-center rounded-full bg-red-500/10 px-3 py-1
+                                               text-red-300 border border-red-500/40 hover:bg-red-500/20
+                                               text-xs transition-colors">
+                                    Excluir
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(tratamentos)}">
+                    <td colspan="4" class="px-4 py-4 text-center text-sm text-slate-400">
+                        Nenhum tratamento cadastrado.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-      <div>
-        <button type="submit">Salvar</button>
-        <a th:href="@{/clientes}">Voltar</a>
-      </div>
-    </form>
-  </body>
+        <div class="px-4 py-3 border-t border-slate-800 text-right text-xs">
+            <a th:href="@{|/relatorios/clientes/${clienteId}/tratamentos|}" target="_blank"
+               class="inline-flex items-center rounded-full border border-slate-700 bg-slate-900/80
+                      px-3 py-1 text-slate-200 hover:border-emerald-400 hover:text-emerald-300
+                      transition-colors">
+                Baixar relatório PDF de tratamentos
+            </a>
+        </div>
+    </section>
+
+    <!-- Novo tratamento -->
+    <section class="bg-slate-900/70 border border-slate-800 rounded-2xl shadow-lg shadow-black/40 p-6">
+        <h3 class="text-lg font-semibold mb-2">Novo tratamento</h3>
+        <p class="text-sm text-slate-400 mb-4">
+            Cadastre um novo plano de tratamento para este cliente.
+        </p>
+
+        <form th:action="@{|/clientes/${clienteId}/tratamentos|}"
+              th:object="${tratamento}"
+              method="post"
+              class="space-y-4 md:space-y-0 md:grid md:grid-cols-3 md:gap-4">
+            <div class="md:col-span-1">
+                <label for="areaTratamento" class="block text-sm font-medium text-slate-200 mb-1">
+                    Área
+                </label>
+                <input id="areaTratamento" th:field="*{areaTratamento}" required
+                       placeholder="Ex.: Axilas, Perna completa..."
+                       class="block w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm
+                              text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2
+                              focus:ring-emerald-400 focus:border-emerald-400">
+            </div>
+
+            <div>
+                <label for="sessoesRecomendadas" class="block text-sm font-medium text-slate-200 mb-1">
+                    Sessões recomendadas
+                </label>
+                <input id="sessoesRecomendadas" type="number" min="1"
+                       th:field="*{sessoesRecomendadas}" required
+                       class="block w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm
+                              text-slate-100 focus:outline-none focus:ring-2
+                              focus:ring-emerald-400 focus:border-emerald-400">
+            </div>
+
+            <div>
+                <label for="status" class="block text-sm font-medium text-slate-200 mb-1">
+                    Status (opcional)
+                </label>
+                <input id="status" th:field="*{status}"
+                       placeholder="AGENDADO, EM_ANDAMENTO, CONCLUIDO..."
+                       class="block w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm
+                              text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2
+                              focus:ring-emerald-400 focus:border-emerald-400">
+            </div>
+
+            <div class="md:col-span-3 flex justify-between pt-2">
+                <a th:href="@{/clientes}"
+                   class="inline-flex items-center rounded-lg border border-slate-700
+                          px-4 py-2 text-sm text-slate-200 hover:border-emerald-400
+                          hover:text-emerald-300 transition-colors">
+                    Voltar
+                </a>
+                <button type="submit"
+                        class="inline-flex items-center rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold
+                               text-slate-900 shadow-lg shadow-emerald-500/40 hover:bg-emerald-400 transition-colors">
+                    Salvar tratamento
+                </button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
 </html>

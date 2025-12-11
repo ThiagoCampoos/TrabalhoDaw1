@@ -2,36 +2,118 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Ficha de Avaliação</title>
+    <title>Ficha de Avaliação - Star Depiller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<h1>Ficha de Avaliação</h1>
-
-<form th:action="@{|/clientes/${clienteId}/ficha|}"
-      th:object="${ficha}"
-      method="post">
-
-    <div>
-        <label for="fototipo">Fototipo:</label>
-        <input id="fototipo" type="text" th:field="*{fototipo}" />
+<body class="min-h-screen bg-slate-950 text-slate-100">
+<header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-semibold tracking-tight">
+                Star <span class="text-emerald-400">Depiller</span>
+            </h1>
+            <p class="text-xs text-slate-400">
+                Ficha de Avaliação do Cliente
+            </p>
+        </div>
+        <a th:href="@{/clientes}"
+           class="text-xs text-slate-300 hover:text-emerald-300 transition-colors">
+            Voltar para clientes
+        </a>
     </div>
+</header>
 
-    <div>
-        <label for="alergias">Alergias:</label>
-        <textarea id="alergias" th:field="*{alergias}"></textarea>
-    </div>
+<main class="max-w-4xl mx-auto px-4 py-8">
+    <section class="bg-slate-900/70 border border-slate-800 rounded-2xl shadow-lg shadow-black/40 p-6">
+        <h2 class="text-lg font-semibold mb-2">Ficha de Avaliação</h2>
+        <p class="text-sm text-slate-400 mb-6">
+            Registre informações importantes para o tratamento a laser.
+        </p>
 
-    <div>
-        <label for="consentimento">
-            <input id="consentimento" type="checkbox" th:field="*{consentimento}" />
-            Li e concordo com o termo de consentimento.
-        </label>
-    </div>
+        <!-- Mensagens de validação globais (se quiser) -->
+        <div th:if="${#fields.hasErrors('*')}"
+             class="mb-4 rounded-lg bg-red-500/10 border border-red-500/40 px-4 py-3 text-sm text-red-200">
+            Existem erros no formulário. Verifique os campos destacados abaixo.
+        </div>
 
-    <div>
-        <button type="submit">Salvar</button>
-        <a th:href="@{/clientes}">Voltar</a>
-    </div>
-</form>
+        <form th:action="@{|/clientes/${clienteId}/ficha|}"
+              th:object="${ficha}"
+              method="post"
+              class="space-y-5">
+
+            <!-- Fototipo -->
+            <div>
+                <label for="fototipo" class="block text-sm font-medium text-slate-200 mb-1">
+                    Fototipo
+                </label>
+                <input id="fototipo" type="text" th:field="*{fototipo}"
+                       placeholder="Ex.: II, III, IV..."
+                       class="block w-full rounded-lg border
+                              border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100
+                              placeholder-slate-500 focus:outline-none focus:ring-2
+                              focus:ring-emerald-400 focus:border-emerald-400"
+                       />
+                <p th:if="${#fields.hasErrors('fototipo')}"
+                   th:errors="*{fototipo}"
+                   class="mt-1 text-xs text-red-300">
+                    Erro no fototipo
+                </p>
+            </div>
+
+            <!-- Alergias -->
+            <div>
+                <label for="alergias" class="block text-sm font-medium text-slate-200 mb-1">
+                    Alergias / Condições de pele
+                </label>
+                <textarea id="alergias" rows="4" th:field="*{alergias}"
+                          placeholder="Descreva alergias conhecidas, uso de medicamentos, sensibilidade de pele, etc."
+                          class="block w-full rounded-lg border
+                                 border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100
+                                 placeholder-slate-500 focus:outline-none focus:ring-2
+                                 focus:ring-emerald-400 focus:border-emerald-400"></textarea>
+                <p th:if="${#fields.hasErrors('alergias')}"
+                   th:errors="*{alergias}"
+                   class="mt-1 text-xs text-red-300">
+                    Erro nas alergias
+                </p>
+            </div>
+
+            <!-- Consentimento -->
+            <div class="rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-3">
+                <label class="flex items-start gap-2">
+                    <input id="consentimento" type="checkbox" th:field="*{consentimento}"
+                           class="mt-1 h-4 w-4 rounded border-slate-600 bg-slate-900
+                                  text-emerald-400 focus:ring-emerald-400" />
+                    <span class="text-sm text-slate-200">
+                        Declaro que li e concordo com o termo de consentimento para tratamentos de depilação a laser,
+                        estou ciente dos cuidados pré e pós procedimento e forneci informações verdadeiras sobre
+                        meu histórico de saúde.
+                    </span>
+                </label>
+                <p th:if="${#fields.hasErrors('consentimento')}"
+                   th:errors="*{consentimento}"
+                   class="mt-1 text-xs text-red-300">
+                    É necessário confirmar o consentimento para prosseguir.
+                </p>
+            </div>
+
+            <!-- Ações -->
+            <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                <a th:href="@{/clientes}"
+                   class="inline-flex items-center justify-center rounded-lg border border-slate-700
+                          px-4 py-2 text-sm text-slate-200 hover:border-emerald-400 hover:text-emerald-300
+                          transition-colors">
+                    Cancelar
+                </a>
+                <button type="submit"
+                        class="inline-flex items-center justify-center rounded-lg bg-emerald-500
+                               px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg
+                               shadow-emerald-500/40 hover:bg-emerald-400 transition-colors">
+                    Salvar ficha
+                </button>
+            </div>
+        </form>
+    </section>
+</main>
 </body>
 </html>

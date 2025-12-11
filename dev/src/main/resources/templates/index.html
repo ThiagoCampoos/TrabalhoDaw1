@@ -3,31 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <title>StarDepiller - Agenda</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <header>
-        <h1>Bem-vindo ao StarDepiller</h1>
-        <nav>
-            <a th:href="@{/clientes}">Clientes</a>
-            <a th:href="@{/tratamentos}">Tratamentos</a>
-            <a th:href="@{/sessoes}">Sessões</a>
-            <a th:href="@{/fichas-avaliacao}">Fichas de Avaliação</a>
-            <a th:href="@{/logout}">Sair</a>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+<header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-semibold tracking-tight">
+                Star <span class="text-emerald-400">Depiller</span>
+            </h1>
+            <p class="text-xs text-slate-400">
+                Painel de agendamento e acompanhamento de tratamentos
+            </p>
+        </div>
+        <nav class="flex items-center gap-4 text-sm">
+            <a th:href="@{/clientes}"
+               class="text-slate-300 hover:text-emerald-300 transition-colors">
+                Clientes
+            </a>
+            <a th:href="@{/logout}"
+               class="text-slate-400 hover:text-red-300 transition-colors text-xs">
+                Sair
+            </a>
         </nav>
-    </header>
-    <main>
-        <section>
-            <h2>Agenda de tratamentos</h2>
-            <p>Gerencie clientes, sessões e tratamentos de forma simples e segura.</p>
-        </section>
-        <section>
-            <h3>Relatórios</h3>
-            <a th:href="@{/relatorios}">Acessar relatórios</a>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2025 StarDepiller</p>
-    </footer>
+    </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-10 space-y-10">
+    <!-- Hero -->
+    <section class="grid gap-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] items-center">
+        <div>
+            <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-3">
+                Agenda inteligente para
+                <span class="text-emerald-400">depilação a laser</span>.
+            </h2>
+            <p class="text-sm md:text-base text-slate-300 mb-6">
+                Gerencie clientes, fichas de avaliação, tratamentos e sessões em um
+                único lugar, com controle de progresso e relatórios em PDF.
+            </p>
+            <div class="flex flex-wrap gap-3">
+                <a th:href="@{/clientes}"
+                   class="inline-flex items-center rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold
+                          text-slate-900 shadow-lg shadow-emerald-500/40 hover:bg-emerald-400 transition-colors">
+                    Ir para a lista de clientes
+                </a>
+                <a th:href="@{/relatorios}"
+                   class="inline-flex items-center rounded-lg border border-slate-700 bg-slate-900/80
+                          px-4 py-2.5 text-sm text-slate-200 hover:border-emerald-400 hover:text-emerald-300
+                          transition-colors">
+                    Acessar relatórios
+                </a>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 shadow-xl shadow-black/40 p-5 space-y-4">
+            <p class="text-xs uppercase tracking-[0.2em] text-slate-400">
+                Visão geral rápida
+            </p>
+            <ul class="space-y-3 text-sm text-slate-200">
+                <li class="flex items-start gap-2">
+                    <span class="mt-1 h-2 w-2 rounded-full bg-emerald-400"></span>
+                    <span>
+                        Cadastre clientes e registre <span class="font-semibold text-emerald-300">fichas de avaliação</span>
+                        completas para cada um.
+                    </span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="mt-1 h-2 w-2 rounded-full bg-emerald-400"></span>
+                    <span>
+                        Controle <span class="font-semibold text-emerald-300">tratamentos e sessões</span>,
+                        com status automático e bloqueio de conflitos de agenda.
+                    </span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="mt-1 h-2 w-2 rounded-full bg-emerald-400"></span>
+                    <span>
+                        Gere <span class="font-semibold text-emerald-300">relatórios em PDF</span> de tratamentos
+                        e sessões por cliente, prontos para impressão.
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Atalhos principais -->
+    <section class="grid gap-6 md:grid-cols-3">
+        <a th:href="@{/clientes}"
+           class="group rounded-2xl border border-slate-800 bg-slate-900/70 p-5
+                  hover:border-emerald-400 hover:bg-slate-900/80 transition-colors shadow-md shadow-black/30">
+            <h3 class="text-sm font-semibold mb-1 flex items-center justify-between">
+                Clientes
+                <span class="text-[10px] uppercase tracking-wide text-emerald-300">Cadastro</span>
+            </h3>
+            <p class="text-xs text-slate-400">
+                Lista, cadastro e gerenciamento dos clientes da clínica.
+            </p>
+        </a>
+
+        <a th:href="@{/clientes}"
+           class="group rounded-2xl border border-slate-800 bg-slate-900/70 p-5
+                  hover:border-emerald-400 hover:bg-slate-900/80 transition-colors shadow-md shadow-black/30">
+            <h3 class="text-sm font-semibold mb-1 flex items-center justify-between">
+                Tratamentos & Sessões
+                <span class="text-[10px] uppercase tracking-wide text-emerald-300">Agenda</span>
+            </h3>
+            <p class="text-xs text-slate-400">
+                Acesse um cliente, cadastre tratamentos e gerencie as sessões.
+            </p>
+        </a>
+
+        <a th:href="@{/relatorios}"
+           class="group rounded-2xl border border-slate-800 bg-slate-900/70 p-5
+                  hover:border-emerald-400 hover:bg-slate-900/80 transition-colors shadow-md shadow-black/30">
+            <h3 class="text-sm font-semibold mb-1 flex items-center justify-between">
+                Relatórios PDF
+                <span class="text-[10px] uppercase tracking-wide text-emerald-300">Jasper</span>
+            </h3>
+            <p class="text-xs text-slate-400">
+                Gere relatórios de tratamentos e sessões por cliente para impressão.
+            </p>
+        </a>
+    </section>
+</main>
+
+<footer class="border-t border-slate-800 mt-8">
+    <div class="max-w-6xl mx-auto px-4 py-4 text-xs text-slate-500 flex items-center justify-between">
+        <span>&copy; 2025 StarDepiller</span>
+        <span>Sistema interno de agenda e gestão de tratamentos a laser | Trabalho DAW 1 .</span>
+    </div>
+</footer>
 </body>
 </html>

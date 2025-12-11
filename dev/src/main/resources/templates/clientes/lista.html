@@ -1,88 +1,217 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <title>Clientes</title>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-  </head>
-  <body>
-    <h1>Clientes</h1>
-
-    <form
-      hx-get="/clientes"
-      hx-target="#tabela-clientes"
-      hx-push-url="true"
-      hx-trigger="keyup changed delay:400ms from:#busca"
-    >
-      <input
-        type="text"
-        id="busca"
-        name="busca"
-        th:value="${busca}"
-        placeholder="Buscar por nome..."
-      />
-      <noscript>
-        <button type="submit">Buscar</button>
-      </noscript>
-    </form>
-
-    <div
-      id="tabela-clientes"
-      hx-get="/clientes"
-      hx-push-url="true"
-    >
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr th:if="${#lists.isEmpty(clientes)}">
-            <td colspan="4">Nenhum cliente cadastrado.</td>
-          </tr>
-          <tr th:each="c : ${clientes}" th:unless="${#lists.isEmpty(clientes)}">
-            <td th:text="${c.id}"></td>
-            <td th:text="${c.nome}"></td>
-            <td th:text="${c.email}"></td>
-            <td>
-              <a th:href="@{|/clientes/${c.id}/ficha|}">Ficha</a>
-              <a th:href="@{|/clientes/${c.id}/tratamentos|}">Tratamentos</a>
-              <a th:href="@{|/clientes/${c.id}/acompanhamento|}">Acompanhamento</a>
-              <form th:action="@{|/clientes/${c.id}/excluir|}" method="post" style="display: inline">
-                <button type="submit">Excluir</button>
-              </form>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="paginacao">
-        <button
-          th:if="${!pagina.first}"
-          hx-get="/clientes"
-          hx-target="#tabela-clientes"
-          hx-push-url="true"
-          th:attr="hx-vals=${'{' + '&quot;page&quot;:' + (${pagina.number} - 1) + ',&quot;busca&quot;:&quot;' + (busca ?: '') + '&quot;}' }"
-        >
-          Anterior
-        </button>
-
-        <span th:text="${pagina.number + 1} + ' / ' + ${pagina.totalPages}"
-          >1 / 1</span
-        >
-
-        <button
-          th:if="${!pagina.last}"
-          hx-get="/clientes"
-          hx-target="#tabela-clientes"
-          hx-push-url="true"
-          th:attr="hx-vals=${'{' + '&quot;page&quot;:' + (${pagina.number} + 1) + ',&quot;busca&quot;:&quot;' + (busca ?: '') + '&quot;}' }"
-        >
-          Próxima
-        </button>
-      </div>
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes - Star Depiller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+<header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-semibold tracking-tight">
+                Star <span class="text-emerald-400">Depiller</span>
+            </h1>
+            <p class="text-xs text-slate-400">
+                Painel de clientes
+            </p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a th:href="@{/logout}"
+               class="text-xs text-slate-300 hover:text-emerald-300 transition-colors">
+                Sair
+            </a>
+        </div>
     </div>
-  </body>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+
+    <!-- Cabeçalho e busca -->
+    <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+            <h2 class="text-2xl font-semibold tracking-tight">Clientes</h2>
+            <p class="text-sm text-slate-400">
+                Gerencie o cadastro de clientes da clínica.
+            </p>
+        </div>
+
+        <!-- busca usa o parâmetro 'busca' do controller -->
+        <form th:action="@{/clientes}" method="get" class="flex gap-2 items-center">
+            <input type="text" name="busca" placeholder="Buscar por nome..."
+                   th:value="${busca}"
+                   class="w-48 md:w-64 rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm
+                          placeholder-slate-500 focus:outline-none focus:ring-2
+                          focus:ring-emerald-400 focus:border-emerald-400">
+            <button type="submit"
+                    class="inline-flex items-center gap-1 rounded-lg bg-slate-800 px-3 py-2 text-xs font-medium
+                           text-slate-100 border border-slate-700 hover:border-emerald-400 hover:text-emerald-300
+                           transition-colors">
+                Buscar
+            </button>
+        </form>
+    </section>
+
+    <!-- Lista + paginação (embrulhado em um container para htmx) -->
+    <div id="lista-clientes">
+        <section class="bg-slate-900/70 border border-slate-800 rounded-2xl shadow-lg shadow-black/40 overflow-hidden">
+            <div class="px-4 py-3 flex items-center justify-between border-b border-slate-800">
+                <span class="text-sm font-medium text-slate-200">Lista de clientes</span>
+                <span class="text-xs text-slate-400"
+                      th:text="|Página ${pagina.number + 1} de ${pagina.totalPages}|">
+                    Página 1 de 1
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-slate-900/80 border-b border-slate-800">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-medium text-slate-400">Nome</th>
+                        <th class="px-4 py-3 text-left font-medium text-slate-400">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+                    <tr th:each="c : ${pagina.content}"
+                        class="hover:bg-slate-900/60 transition-colors">
+                        <td class="px-4 py-3">
+                            <span class="font-medium" th:text="${c.nome}">Nome do Cliente</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                <a th:href="@{|/clientes/${c.id}/ficha|}"
+                                   class="inline-flex items-center rounded-full bg-slate-800 px-3 py-1
+                                          text-slate-200 border border-slate-700 hover:border-emerald-400
+                                          hover:text-emerald-300 transition-colors">
+                                    Ficha
+                                </a>
+                                <a th:href="@{|/clientes/${c.id}/tratamentos|}"
+                                   class="inline-flex items-center rounded-full bg-slate-800 px-3 py-1
+                                          text-slate-200 border border-slate-700 hover:border-emerald-400
+                                          hover:text-emerald-300 transition-colors">
+                                    Tratamentos
+                                </a>
+                                <a th:href="@{|/clientes/${c.id}/acompanhamento|}"
+                                   class="inline-flex items-center rounded-full bg-slate-800 px-3 py-1
+                                          text-slate-200 border border-slate-700 hover:border-emerald-400
+                                          hover:text-emerald-300 transition-colors">
+                                    Acompanhamento
+                                </a>
+                                <form th:action="@{|/clientes/${c.id}/excluir|}" method="post"
+                                      onsubmit="return confirm('Confirma excluir este cliente?');">
+                                    <button type="submit"
+                                            class="inline-flex items-center rounded-full bg-red-500/10 px-3 py-1
+                                                   text-red-300 border border-red-500/40 hover:bg-red-500/20
+                                                   text-xs transition-colors">
+                                        Excluir
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(pagina.content)}">
+                        <td colspan="2" class="px-4 py-4 text-center text-sm text-slate-400">
+                            Nenhum cliente encontrado.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            <div class="px-4 py-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                <div>
+                    <span th:text="|Total: ${pagina.totalElements} clientes|">Total: 0 clientes</span>
+                </div>
+                <div class="flex gap-2">
+                    <a th:if="${!pagina.first}"
+                       th:href="@{|/clientes?page=${pagina.number - 1}&size=${pagina.size}&busca=${busca}|}"
+                       hx-get="@{|/clientes?page=${pagina.number - 1}&size=${pagina.size}&busca=${busca}|}"
+                       hx-target="#lista-clientes"
+                       hx-swap="outerHTML"
+                       class="px-3 py-1 rounded-full border border-slate-700 bg-slate-900/80
+                              hover:border-emerald-400 hover:text-emerald-300 transition-colors">
+                        Anterior
+                    </a>
+                    <span th:text="|Página ${pagina.number + 1} de ${pagina.totalPages}|">
+                        Página 1 de 1
+                    </span>
+                    <a th:if="${!pagina.last}"
+                       th:href="@{|/clientes?page=${pagina.number + 1}&size=${pagina.size}&busca=${busca}|}"
+                       hx-get="@{|/clientes?page=${pagina.number + 1}&size=${pagina.size}&busca=${busca}|}"
+                       hx-target="#lista-clientes"
+                       hx-swap="outerHTML"
+                       class="px-3 py-1 rounded-full border border-slate-700 bg-slate-900/80
+                              hover:border-emerald-400 hover:text-emerald-300 transition-colors">
+                        Próxima
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Formulário de novo cliente -->
+    <section class="bg-slate-900/70 border border-slate-800 rounded-2xl shadow-lg shadow-black/40 p-6">
+        <h3 class="text-lg font-semibold mb-4">Novo cliente</h3>
+        <form th:action="@{/clientes}" th:object="${clienteForm}" method="post"
+              class="grid gap-4 md:grid-cols-2 md:items-end">
+
+            <!-- Nome -->
+            <div>
+                <label for="nome" class="block text-sm font-medium text-slate-200 mb-1">
+                    Nome
+                </label>
+                <input id="nome" th:field="*{nome}" required
+                       class="block w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm
+                              text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2
+                              focus:ring-emerald-400 focus:border-emerald-400">
+            </div>
+
+            <!-- Email (obrigatório) -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-slate-200 mb-1">
+                    Email
+                </label>
+                <input id="email" type="email" th:field="*{email}" required
+                       placeholder="cliente@exemplo.com"
+                       class="block w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm
+                              text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2
+                              focus:ring-emerald-400 focus:border-emerald-400">
+            </div>
+
+            <!-- Telefone (opcional) -->
+            <div>
+                <label for="telefone" class="block text-sm font-medium text-slate-200 mb-1">
+                    Telefone
+                </label>
+                <input id="telefone" th:field="*{telefone}"
+                       placeholder="(11) 99999-9999"
+                       class="block w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm
+                              text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2
+                              focus:ring-emerald-400 focus:border-emerald-400">
+            </div>
+
+            <!-- Data de nascimento (opcional) -->
+            <div>
+                <label for="dataNascimento" class="block text-sm font-medium text-slate-200 mb-1">
+                    Data de nascimento
+                </label>
+                <input id="dataNascimento" type="date" th:field="*{dataNascimento}"
+                       class="block w-full rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm
+                              text-slate-100 focus:outline-none focus:ring-2
+                              focus:ring-emerald-400 focus:border-emerald-400">
+            </div>
+
+            <!-- Botão -->
+            <div class="md:col-span-2 flex gap-2 md:justify-end">
+                <button type="submit"
+                        class="inline-flex items-center rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold
+                               text-slate-900 shadow-lg shadow-emerald-500/40 hover:bg-emerald-400 transition-colors">
+                    Salvar cliente
+                </button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
 </html>

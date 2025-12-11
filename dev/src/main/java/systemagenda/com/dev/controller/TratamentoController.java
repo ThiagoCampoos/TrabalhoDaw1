@@ -26,9 +26,9 @@ public class TratamentoController {
     @GetMapping("/clientes/{clienteId}/tratamentos")
     public String listarTratamento(@PathVariable UUID clienteId, Model model) {
         List<Tratamento> tratamentos = tratamentoService.listarPorCliente(clienteId);
-        model.addAttribute("tratamentos", tratamentos);
+        model.addAttribute("tratamentos", tratamentos);   // lista para a tabela
         model.addAttribute("clienteId", clienteId);
-        model.addAttribute("tratamentos", new Tratamento());
+        model.addAttribute("tratamento", new Tratamento()); // objeto do form (NOME DIFERENTE)
         return "tratamentos/lista";
     }
 
